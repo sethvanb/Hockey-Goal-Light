@@ -1,18 +1,13 @@
 import datetime
 import time
-# import RPi.GPIO as GPIO
-# import vlc
-import re
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+import RPi.GPIO as GPIO
+import vlc
+# import re
+# from bs4 import BeautifulSoup
+# from selenium import webdriver
+# from selenium.webdriver.common.by import By
 
 # Run with cronjob at 8am Eastern
-options = webdriver.ChromeOptions()
-options.add_argument('--ignore-certificate-errors')
-options.add_argument('--incognito')
-options.add_argument('--headless')
-driver = webdriver.Chrome("/usr/lib/chromium-browser/chromedriver", chrome_options=options)
 
 def get_todays_game(team):
     return "Now"
@@ -49,25 +44,26 @@ def get_score(team):
         return 999
 
 def main():
-    team = 'Sharks' # 'Blue Jackets' # "Panthers" # "Blackhawks" # 'Penguins'
+    team = 'Kraken' # 'Sharks'
     game_time = get_todays_game(team)
     now = datetime.datetime.now()
     tomorrow = now.replace(hour=0, minute=0, second=0) + datetime.timedelta(days=1)
     month = now.month
     if game_time and (month < 6 or month > 9):
-        # h = int(game_time[0 : game_time.index(":")]) - 3
-        # m = int(game_time[game_time.index(":")+1 : game_time.index(":")+3])
-        # if game_time.find("PM"):
-        #     h = h + 12
-        # game_time = now.replace(hour=h, minute=m)
-        # time.sleep((game_time-now).total_seconds())
+        h = int(game_time[0 : game_time.index(":")]) - 3
+        m = int(game_time[game_time.index(":")+1 : game_time.index(":")+3])
+        if game_time.find("PM"):
+            h = h + 12
+        game_time = now.replace(hour=h, minute=m)
+        time.sleep((game_time-now).total_seconds())
 
-        # GPIO.setwarnings(False)
-        # GPIO.setmode(GPIO.BCM)  
-        # GPIO.setup(2, GPIO.OUT)  # Setup GPIO Pin to 2
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)  
+        GPIO.setup(2, GPIO.OUT)  # Setup GPIO Pin to 2
+
         old_score = 0
         errors = 0
-        on_power_play = False
+        # on_power_play = False
         now = datetime.datetime.now()
         while now < tomorrow:
             new_score = get_score(team)
@@ -82,11 +78,11 @@ def main():
                 return 0
             elif new_score > old_score:  # Goal has been scored
                 print('GOAL!')
-                # GPIO.output(2, True)  # Light ON
+                GPIO.output(2, True)  # Light ON
                 p = vlc.MediaPlayer("SJGoalHorn.mp3")
                 p.play() # Play Goal Song
                 time.sleep(36)
-                # GPIO.output(2, False)     # Light OFF
+                GPIO.output(2, False)     # Light OFF
                 old_score = new_score
 
             # if power_play and not on_power_play:
@@ -96,7 +92,7 @@ def main():
             #     on_power_play = True
             # elif not power_play and on_power_play:
             #     on_power_play = False
-            
+
             now = datetime.datetime.now()
 
 if __name__ == "__main__":
