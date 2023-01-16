@@ -40,7 +40,7 @@ def main():
     now = datetime.datetime.utcnow()
     tomorrow = now.replace(hour=0, minute=0, second=0) + datetime.timedelta(days=1)
     url = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=" + str(now.date())
-    print(url)
+    print(now.date())
     # team = 'Boston Bruins' 
     team = 'San Jose Sharks'
     game_time = get_todays_game(url, team)
