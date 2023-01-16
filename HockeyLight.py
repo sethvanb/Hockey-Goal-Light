@@ -6,10 +6,9 @@ import requests
 
 # Run with cronjob at 8am Eastern
 
-def get_todays_game(team):
+def get_todays_game(url, team):
     try:
-        API_URL = "https://statsapi.web.nhl.com/api/v1"
-        response = requests.get(API_URL + "/schedule?startDate=2023-01-16", params={"Content-Type": "application/json"})
+        response = requests.get(url, params={"Content-Type": "application/json"})
         data = response.json()
         games = data['dates'][0]['games']
         for game in games:
@@ -19,10 +18,9 @@ def get_todays_game(team):
     except:
         return None
 
-def get_score(team):
+def get_score(url, team):
     try:
-        API_URL = "https://statsapi.web.nhl.com/api/v1"
-        response = requests.get(API_URL + "/schedule?startDate=2023-01-16", params={"Content-Type": "application/json"})
+        response = requests.get(url, params={"Content-Type": "application/json"})
         data = response.json()
         games = data['dates'][0]['games']
         for game in games:
@@ -39,11 +37,13 @@ def get_score(team):
         return 999
 
 def main():
-    # team = 'Boston Bruins' 
-    team = 'San Jose Sharks'
-    game_time = get_todays_game(team)
     now = datetime.datetime.utcnow()
     tomorrow = now.replace(hour=0, minute=0, second=0) + datetime.timedelta(days=1)
+    url = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=" + str(now.date())
+    print(url)
+    # team = 'Boston Bruins' 
+    team = 'San Jose Sharks'
+    game_time = get_todays_game(url, team)
     month = now.month
     if game_time and (month < 6 or month > 9):
         game_time = datetime.datetime.fromisoformat(game_time[:-1])
@@ -62,7 +62,7 @@ def main():
         # on_power_play = False
         now = datetime.datetime.now()
         while now < tomorrow:
-            new_score = get_score(team)
+            new_score = get_score(url, team)
             # {new_score, power_play} = get_score(team)
             if new_score >= 999:  # Error occurred
                 errors += 1
@@ -84,7 +84,7 @@ def main():
                     GPIO.output(2, True)  # Light ON
                     p = vlc.MediaPlayer("GameStart.mp3")
                     p.play()
-                    time.sleep(5)
+                    time.sleep(4)
                     GPIO.output(2, False)     # Light OFF
             elif new_score > old_score:  # Goal has been scored
                 print(new_score)
@@ -103,7 +103,7 @@ def main():
             #     on_power_play = True
             # elif not power_play and on_power_play:
             #     on_power_play = False
-            time.sleep(3)
+
             now = datetime.datetime.now()
 
 if __name__ == "__main__":
