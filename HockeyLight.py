@@ -37,6 +37,7 @@ def get_score(url, team):
         return 999
 
 def main():
+    print("--------------------------------------------")
     now = datetime.datetime.utcnow()
     tomorrow = now.replace(hour=0, minute=0, second=0) + datetime.timedelta(days=1)
     url = "https://statsapi.web.nhl.com/api/v1/schedule?startDate=" + str(now.date())
@@ -72,7 +73,6 @@ def main():
                 if pregame == 0:
                     pregame = 1
                     print('PRE-GAME')
-                return 0
             elif new_score == 998:
                 print('FINAL')
                 print('errors ' + str(errors))
@@ -105,6 +105,8 @@ def main():
             #     on_power_play = False
 
             now = datetime.datetime.now()
+    else:
+        print("No Game Today")
 
 if __name__ == "__main__":
     main()
