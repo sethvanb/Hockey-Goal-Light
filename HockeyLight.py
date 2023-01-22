@@ -24,15 +24,20 @@ def get_score(url, team):
         data = response.json()
         games = data['dates'][0]['games']
         for game in games:
-            if game['status']['detailedState'] == 'Final':
-                return 998
-            if game['status']['detailedState'] == 'Pre-Game':
-                return 997
-            if game['status']['detailedState'] == 'In Progress':
-                if game['teams']['away']['team']['name'] == team: 
+            if game['teams']['away']['team']['name'] == team:
+                if game['status']['detailedState'] == 'Final':
+                    return 998
+                if game['status']['detailedState'] == 'Pre-Game':
+                    return 997
+                if game['status']['detailedState'] == 'In Progress':
                     return game['teams']['away']['score']
-                elif game['teams']['home']['team']['name'] == team: 
-                    return game['teams']['home']['score']
+            elif game['teams']['home']['team']['name'] == team: 
+                if game['status']['detailedState'] == 'Final':
+                    return 998
+                if game['status']['detailedState'] == 'Pre-Game':
+                    return 997
+                if game['status']['detailedState'] == 'In Progress':
+                    return game['teams']['away']['score']
     except:
         return 999
 
